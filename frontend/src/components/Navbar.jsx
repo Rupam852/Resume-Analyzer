@@ -48,9 +48,9 @@ const Navbar = () => {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-4 py-1.8 rounded-lg border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-bold uppercase transition-all duration-200 cursor-pointer shadow-sm"
+              className="flex items-center gap-2 px-5.5 py-2.5 rounded-full border-2 border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-extrabold uppercase transition-all duration-200 cursor-pointer shadow-sm"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-4 h-4" strokeWidth={2.5} />
               Sign Out
             </button>
           </>
