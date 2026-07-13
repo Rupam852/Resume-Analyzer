@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [history, setHistory] = useState([]);
   const [fetchingHistory, setFetchingHistory] = useState(true);
-  const [activeEngine, setActiveEngine] = useState({ provider: 'gemini', model: 'gemini-1.5-flash' });
+  const [activeEngine, setActiveEngine] = useState({ provider: 'gemini', model: 'gemini-3.5-flash' });
 
   const fileInputRef = useRef(null);
 

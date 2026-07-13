@@ -35,9 +35,9 @@ app.use(express.urlencoded({ extended: true }));
 // Health Check Endpoints
 app.get('/health', (req, res) => {
   const provider = process.env.AI_PROVIDER || 'gemini';
-  let model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4o-mini');
-  if (model === 'gemini-2.5-flash') {
-    model = 'gemini-1.5-flash';
+  let model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-3.5-flash' : 'gpt-4o-mini');
+  if (model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash') {
+    model = 'gemini-3.5-flash';
   }
   res.json({
     status: 'online',
@@ -77,6 +77,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server is active on port: ${PORT}`);
   console.log(`🔗 Allowed CORS origin: ${frontendUrl}`);
   console.log(`🧠 Dynamic AI Provider: ${process.env.AI_PROVIDER || 'gemini'}`);
-  console.log(`🤖 Dynamic AI Model Name: ${process.env.AI_MODEL_NAME || 'gemini-1.5-flash'}`);
+  console.log(`🤖 Dynamic AI Model Name: ${process.env.AI_MODEL_NAME || 'gemini-3.5-flash'}`);
   console.log(`=============================================`);
 });
