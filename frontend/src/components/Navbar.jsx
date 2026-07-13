@@ -30,10 +30,7 @@ const Navbar = () => {
           {user ? (
             <>
 
-              <div className="hidden md:flex flex-col text-right font-mono text-[10px] leading-tight">
-                <span className="text-zinc-400 font-bold">AGENT: {user.name.toUpperCase()}</span>
-                <span className="text-neogreen tracking-wider">{user.targetJobRole.toUpperCase()}</span>
-              </div>
+
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 border-neo text-xs font-bold uppercase bg-neopink text-black shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer"
