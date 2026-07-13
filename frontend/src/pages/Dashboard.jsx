@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'react-serif'; // Wait, let's keep axios!
+import axiosInstance from 'axios';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { 
   Upload, 
@@ -38,7 +39,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHistoryAndEngine = async () => {
       try {
-        const historyRes = await axios.get(`${API_URL}/api/resume/history`, getAuthHeaders());
+        const historyRes = await axiosInstance.get(`${API_URL}/api/resume/history`, getAuthHeaders());
         setHistory(historyRes.data);
       } catch (err) {
         console.error('Failed to load history:', err);
@@ -47,7 +48,7 @@ const Dashboard = () => {
       }
 
       try {
-        const healthRes = await axios.get(`${API_URL}/health`);
+        const healthRes = await axiosInstance.get(`${API_URL}/health`);
         setActiveEngine({
           provider: healthRes.data.provider,
           model: healthRes.data.model
@@ -141,7 +142,7 @@ const Dashboard = () => {
     formData.append('jobDescription', jobDescription);
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}/api/resume/analyze`, 
         formData, 
         {
@@ -165,69 +166,71 @@ const Dashboard = () => {
   };
 
   const getScoreColorClass = (score) => {
-    if (score >= 80) return 'text-neogreen border-neogreen bg-neogreen/10';
-    if (score >= 50) return 'text-neoyellow border-neoyellow bg-neoyellow/10';
-    return 'text-neopink border-neopink bg-neopink/10';
+    if (score >= 80) return 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5';
+    if (score >= 50) return 'text-amber-400 border-amber-500/20 bg-amber-500/5';
+    return 'text-rose-400 border-rose-500/20 bg-rose-500/5';
   };
 
   return (
-    <div className="min-h-[calc(100vh-76px)] bg-neobg text-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="min-h-[calc(100vh-76px)] bg-neobg text-zinc-100 p-4 md:p-8 relative overflow-hidden">
+      <div className="bg-grid-glow"></div>
+      
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         
         {/* Left Column: Upload / Paste Console */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-neocard border-2 border-black p-6 shadow-neo">
-            <h2 className="font-mono text-xl font-black uppercase tracking-tight text-white mb-2 flex items-center gap-2">
+          <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl shadow-neo backdrop-blur-md">
+            <h2 className="text-lg font-bold tracking-wide text-white mb-1.5 flex items-center gap-2">
               <Terminal className="w-5 h-5 text-neogreen" />
-              ANALYSIS INITIATION CONSOLE
+              Analysis Initiation Console
             </h2>
-            <p className="text-zinc-400 text-xs font-mono mb-6 uppercase">
+            <p className="text-zinc-500 text-xs font-mono mb-6 uppercase tracking-wider">
               FEED RESUME BYTES, TEXT OR WEBPAGE VECTORS TO SCANNER
             </p>
 
             {/* Ingestion Method Tabs */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-neogray border-neo border-2 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 p-1 bg-white/[0.02] border border-white/5 rounded-xl mb-6">
               <button
                 type="button"
                 onClick={() => { setActiveTab('upload'); setError(''); }}
-                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'upload'
-                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    ? 'bg-gradient-to-r from-neogreen to-necyan text-black shadow-sm font-bold'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <Upload className="w-3.5 h-3.5 inline mr-1.5" />
+                <Upload className="w-3.5 h-3.5" />
                 Upload PDF/Image
               </button>
               <button
                 type="button"
                 onClick={() => { setActiveTab('text'); setError(''); }}
-                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'text'
-                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    ? 'bg-gradient-to-r from-neogreen to-necyan text-black shadow-sm font-bold'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <FileCode className="w-3.5 h-3.5 inline mr-1.5" />
+                <FileCode className="w-3.5 h-3.5" />
                 Paste Text
               </button>
               <button
                 type="button"
                 onClick={() => { setActiveTab('link'); setError(''); }}
-                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'link'
-                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    ? 'bg-gradient-to-r from-neogreen to-necyan text-black shadow-sm font-bold'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <Globe className="w-3.5 h-3.5 inline mr-1.5" />
+                <Globe className="w-3.5 h-3.5" />
                 Portfolio Link
               </button>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 border-neo bg-neopink/10 border-neopink text-neopink text-xs font-mono flex items-start gap-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <AlertCircle className="w-5 h-5 shrink-0" />
+              <div className="mb-6 p-4 rounded-xl border border-rose-500/25 bg-rose-500/5 text-rose-400 text-xs font-mono flex items-start gap-3 shadow-sm">
+                <AlertCircle className="w-5 h-5 shrink-0 text-rose-400" />
                 <div>
                   <span className="font-bold">SCAN ERROR DETECTED:</span> {error}
                 </div>
@@ -238,8 +241,8 @@ const Dashboard = () => {
               {/* Conditional Ingestion Zone */}
               {activeTab === 'upload' && (
                 <div>
-                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                    1. RESUME FILE (PDF, JPG, JPEG, PNG - MAX 10MB)
+                  <label className="block text-[11px] font-semibold text-zinc-400 mb-2 uppercase tracking-wider">
+                    1. Resume File (PDF, JPG, PNG - Max 10MB)
                   </label>
                   
                   <div
@@ -248,10 +251,10 @@ const Dashboard = () => {
                     onDragLeave={handleDrag}
                     onDrop={handleDrop}
                     onClick={triggerFileSelect}
-                    className={`border-2 border-dashed p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-150 relative ${
+                    className={`border border-dashed p-10 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-200 bg-white/[0.01] ${
                       dragActive 
-                        ? 'border-neogreen bg-neogreen/5 shadow-[4px_4px_0px_0px_#00ff66]' 
-                        : 'border-zinc-800 bg-neogray shadow-none hover:border-zinc-600'
+                        ? 'border-neogreen bg-neogreen/5 shadow-sm shadow-neogreen/10' 
+                        : 'border-white/10 hover:border-zinc-500 hover:bg-white/[0.02]'
                     }`}
                   >
                     <input
@@ -262,25 +265,25 @@ const Dashboard = () => {
                       className="hidden"
                     />
                     
-                    <Upload className={`w-12 h-12 mb-4 transition-transform ${dragActive ? 'scale-110 text-neogreen' : 'text-zinc-500'}`} />
+                    <Upload className={`w-10 h-10 mb-4 transition-colors ${dragActive ? 'text-neogreen' : 'text-zinc-500'}`} />
                     
                     {file ? (
-                      <div className="text-center font-mono">
-                        <p className="text-neogreen font-bold text-sm uppercase flex items-center justify-center gap-1.5">
+                      <div className="text-center">
+                        <p className="text-neogreen font-semibold text-sm uppercase flex items-center justify-center gap-1.5">
                           <FileText className="w-4 h-4" />
                           {file.name}
                         </p>
                         <p className="text-[10px] text-zinc-500 mt-1">
-                          {(file.size / (1024 * 1024)).toFixed(2)} MB - READY FOR INGESTION
+                          {(file.size / (1024 * 1024)).toFixed(2)} MB — Ready for analysis
                         </p>
                       </div>
                     ) : (
-                      <div className="text-center font-mono">
-                        <p className="text-xs font-bold uppercase tracking-wider text-white">
-                          Drag & Drop File or Click to Select
+                      <div className="text-center">
+                        <p className="text-xs font-semibold text-white tracking-wide">
+                          Drag & drop file or click to browse
                         </p>
-                        <p className="text-[10px] text-zinc-500 mt-2 uppercase">
-                          Supports text PDFs or clean high-contrast images (JPG, PNG)
+                        <p className="text-[10px] text-zinc-500 mt-1.5 uppercase font-mono tracking-wider">
+                          Supports text PDFs or clean high-contrast images
                         </p>
                       </div>
                     )}
@@ -290,32 +293,32 @@ const Dashboard = () => {
 
               {activeTab === 'text' && (
                 <div>
-                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                    1. PASTE YOUR RESUME TEXT
+                  <label className="block text-[11px] font-semibold text-zinc-400 mb-2 uppercase tracking-wider">
+                    1. Paste Resume Content
                   </label>
                   <textarea
                     value={rawResumeText}
                     onChange={(e) => setRawResumeText(e.target.value)}
                     placeholder="Copy and paste the raw text from your resume (contact information, experience, education, projects, skills)..."
                     rows={10}
-                    className="w-full bg-neogray border-neo p-4 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all resize-y"
+                    className="w-full bg-white/[0.01] border border-white/5 rounded-xl p-4 font-mono text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-neogreen/50 focus:ring-1 focus:ring-neogreen/25 transition-all resize-y"
                   />
                 </div>
               )}
 
               {activeTab === 'link' && (
                 <div>
-                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                    1. ENTER PORTFOLIO WEBSITE LINK
+                  <label className="block text-[11px] font-semibold text-zinc-400 mb-2 uppercase tracking-wider">
+                    1. Enter Portfolio Link
                   </label>
                   <input
                     type="text"
                     value={portfolioUrl}
                     onChange={(e) => setPortfolioUrl(e.target.value)}
                     placeholder="https://your-portfolio-website.com"
-                    className="w-full bg-neogray border-neo px-4 py-3.5 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all"
+                    className="w-full bg-white/[0.01] border border-white/5 rounded-xl px-4 py-3.5 font-mono text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-neogreen/50 focus:ring-1 focus:ring-neogreen/25 transition-all"
                   />
-                  <p className="text-[10px] text-zinc-500 mt-2.5 uppercase font-mono">
+                  <p className="text-[10px] text-zinc-500 mt-2.5 uppercase font-mono tracking-wider">
                     System web crawler will fetch readable text bio, projects, and work info from this link.
                   </p>
                 </div>
@@ -323,15 +326,15 @@ const Dashboard = () => {
 
               {/* Job Description Textarea */}
               <div>
-                <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                  2. TARGET JOB DESCRIPTION (OPTIONAL TEXT MATRICES)
+                <label className="block text-[11px] font-semibold text-zinc-400 mb-2 uppercase tracking-wider">
+                  2. Target Job Description (Optional)
                 </label>
                 <textarea
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   placeholder="Paste destination job criteria, core technical keywords, and requirements to generate comparative alignment score..."
                   rows={6}
-                  className="w-full bg-neogray border-neo p-4 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all resize-y"
+                  className="w-full bg-white/[0.01] border border-white/5 rounded-xl p-4 font-mono text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-neogreen/50 focus:ring-1 focus:ring-neogreen/25 transition-all resize-y"
                 />
               </div>
 
@@ -339,7 +342,7 @@ const Dashboard = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 border-neo bg-neoyellow text-black font-extrabold uppercase shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all duration-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 rounded-xl border border-white/10 bg-gradient-to-r from-neogreen to-necyan text-black font-extrabold uppercase shadow-sm hover:opacity-90 active:scale-[0.98] transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'INGESTING FILES...' : 'EXECUTE AI RESUME VERIFICATION'}
               </button>
@@ -349,25 +352,25 @@ const Dashboard = () => {
 
         {/* Right Column: Execution History Log */}
         <div className="space-y-6">
-          <div className="bg-neocard border-2 border-black p-6 shadow-neo h-full flex flex-col">
-            <h2 className="font-mono text-xl font-black uppercase tracking-tight text-white mb-2 flex items-center gap-2">
+          <div className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl shadow-neo backdrop-blur-md h-full flex flex-col">
+            <h2 className="text-lg font-bold tracking-wide text-white mb-1.5 flex items-center gap-2">
               <Clock className="w-5 h-5 text-neocyan" />
-              HISTORY LOG
+              History Log
             </h2>
-            <p className="text-zinc-400 text-xs font-mono mb-6 uppercase">
+            <p className="text-zinc-500 text-xs font-mono mb-6 uppercase tracking-wider">
               PREVIOUS EVALUATION PASSES RUN BY USER
             </p>
 
             {fetchingHistory ? (
               <div className="flex-grow flex flex-col items-center justify-center py-10 font-mono text-xs text-zinc-500">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-neocyan border-t-transparent mb-2"></div>
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-neocyan border-t-transparent mb-2"></div>
                 FETCHING SECURE ARCHIVES...
               </div>
             ) : history.length === 0 ? (
-              <div className="flex-grow flex flex-col items-center justify-center py-12 border-2 border-dashed border-zinc-800 bg-neogray font-mono text-center">
-                <FileSpreadsheet className="w-8 h-8 text-zinc-600 mb-3" />
+              <div className="flex-grow flex flex-col items-center justify-center py-12 border border-dashed border-white/10 rounded-xl bg-white/[0.01] text-center">
+                <FileSpreadsheet className="w-8 h-8 text-zinc-700 mb-3" />
                 <p className="text-xs uppercase font-bold text-zinc-500">No previous logs found</p>
-                <p className="text-[9px] text-zinc-600 mt-1 uppercase">Run analysis to build ledger</p>
+                <p className="text-[9px] text-zinc-600 mt-1 uppercase font-mono tracking-wider">Run analysis to build ledger</p>
               </div>
             ) : (
               <div className="space-y-3 overflow-y-auto max-h-[500px] pr-2">
@@ -375,13 +378,13 @@ const Dashboard = () => {
                   <Link
                     key={item.id}
                     to={`/results/${item.id}`}
-                    className="block p-4 border-neo bg-neogray shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all flex items-center justify-between group"
+                    className="block p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/10 transition-all flex items-center justify-between group shadow-sm"
                   >
                     <div className="min-w-0 pr-3">
-                      <h4 className="font-bold text-xs uppercase text-white truncate font-mono">
+                      <h4 className="font-semibold text-xs text-white truncate max-w-[150px]">
                         {item.fileName}
                       </h4>
-                      <p className="text-[9px] text-zinc-500 mt-1 font-mono uppercase">
+                      <p className="text-[9px] text-zinc-500 mt-1 font-mono uppercase tracking-wider">
                         {new Date(item.createdAt).toLocaleDateString(undefined, {
                           month: 'short',
                           day: 'numeric',
@@ -391,7 +394,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      <div className={`px-2.5 py-1 border text-xs font-mono font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${getScoreColorClass(item.atsScore)}`}>
+                      <div className={`px-2.5 py-1 rounded-md border text-xs font-mono font-bold shadow-sm ${getScoreColorClass(item.atsScore)}`}>
                         {item.atsScore}%
                       </div>
                       <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
@@ -407,28 +410,28 @@ const Dashboard = () => {
 
       {/* Cyber Fullscreen Processing Overlay */}
       {loading && (
-        <div className="fixed inset-0 z-50 bg-[#07070acc]/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-neocard border-2 border-black max-w-lg w-full p-8 shadow-neo-green font-mono text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f2e_1px,transparent_1px),linear-gradient(to_bottom,#1f1f2e_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-10 animate-pulse pointer-events-none"></div>
+        <div className="fixed inset-0 z-50 bg-[#040407cc]/95 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-zinc-950 border border-white/10 max-w-lg w-full p-8 rounded-2xl shadow-lg relative overflow-hidden font-mono">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-20 animate-pulse pointer-events-none"></div>
 
-            <BrainCircuit className="w-16 h-16 mx-auto mb-6 text-neogreen animate-bounce" />
+            <BrainCircuit className="w-14 h-14 mx-auto mb-6 text-neogreen animate-pulse" />
             
-            <h3 className="text-xl font-black uppercase text-white tracking-tighter mb-2">
-              SCANNING TRANSCRIPT MATRIX...
+            <h3 className="text-lg font-bold uppercase text-white tracking-wide mb-2">
+              Scanning transcript matrix...
             </h3>
             
-            <div className="inline-flex items-center gap-2 px-3 py-1 border-neo text-[10px] font-bold bg-neogray border-neogreen text-neogreen mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 text-[9px] font-bold text-neogreen mb-6">
               <CheckCircle2 className="w-3.5 h-3.5" />
               ACTIVE ENGINE: {activeEngine.provider.toUpperCase()} ({activeEngine.model})
             </div>
 
-            <div className="space-y-3 text-left bg-neogray p-4 border border-zinc-800 text-[11px] leading-relaxed text-zinc-400">
-              <p className="flex items-center gap-2 text-neogreen font-bold">
+            <div className="space-y-3.5 text-left bg-black/40 p-5 rounded-xl border border-white/5 text-[10px] leading-relaxed text-zinc-400">
+              <p className="flex items-center gap-2 text-neogreen font-semibold">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-neogreen animate-ping"></span>
                 [STATUS] Processing resume input vectors...
               </p>
               <p>[STATUS] Injecting evaluation rules for: <span className="text-white font-semibold">"{user?.targetJobRole || 'Software Engineering'}"</span></p>
-              <p className="text-neocyan font-semibold animate-pulse">[INFO] Fetching evaluations from AI interface. This can take up to 45 seconds on Render cold starts...</p>
+              <p className="text-necyan font-semibold">[INFO] Fetching evaluations from AI interface. This can take up to 45 seconds on Render cold starts...</p>
             </div>
           </div>
         </div>

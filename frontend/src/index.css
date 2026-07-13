@@ -1,67 +1,80 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Space Grotesk', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  --color-neobg: #07070a;
-  --color-neocard: #121218;
-  --color-neogreen: #00ff66;
-  --color-neocyan: #00f0ff;
-  --color-neoyellow: #ffe600;
-  --color-neopink: #ff007f;
-  --color-neoborder: #000000;
-  --color-neogray: #1c1c24;
+  --color-neobg: #050508;
+  --color-neocard: rgba(16, 16, 24, 0.75);
+  --color-neogreen: #10b981; /* Emerald Green */
+  --color-necyan: #06b6d4;   /* Cyan Glow */
+  --color-neoyellow: #f59e0b; /* Amber */
+  --color-neopink: #f43f5e;   /* Rose Pink */
+  --color-neoborder: rgba(255, 255, 255, 0.08);
+  --color-neogray: #111118;
 }
 
 @utility border-neo {
-  border: 2px solid #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @utility border-neo-neon {
-  border: 2px solid #00ff66;
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 @utility shadow-neo {
-  box-shadow: 4px 4px 0px 0px #000000;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0px rgba(255, 255, 255, 0.05);
 }
 
 @utility shadow-neo-green {
-  box-shadow: 4px 4px 0px 0px #00ff66;
+  box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.25);
 }
 
 @utility shadow-neo-cyan {
-  box-shadow: 4px 4px 0px 0px #00f0ff;
+  box-shadow: 0 0 30px -5px rgba(6, 182, 212, 0.25);
 }
 
 @utility shadow-neo-yellow {
-  box-shadow: 4px 4px 0px 0px #ffe600;
+  box-shadow: 0 0 30px -5px rgba(245, 158, 11, 0.25);
 }
 
 @utility neo-btn {
-  @apply px-6 py-3 border-neo font-bold uppercase transition-all duration-150 cursor-pointer shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 cursor-pointer shadow-md active:scale-95;
 }
 
-/* Custom Scrollbar for Neo Brutalist Aesthetic */
+/* Custom Scrollbar for Sleek Aesthetic */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #07070a;
-  border-left: 2px solid #000000;
+  background: #050508;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1c1c24;
-  border: 2px solid #000000;
+  background: #27273a;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00ff66;
+  background: #10b981;
 }
 
 body {
-  background-color: #07070a;
+  background-color: #050508;
   color: #f4f4f5;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   overflow-x: hidden;
+  letter-spacing: -0.01em;
+}
+
+/* Smooth background grid glow effect */
+.bg-grid-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.08), transparent 70%),
+                    radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.04), transparent 50%);
+  pointer-events: none;
 }

@@ -59,23 +59,25 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-76px)] bg-neobg flex items-center justify-center p-4 relative">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f2e_1px,transparent_1px),linear-gradient(to_bottom,#1f1f2e_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-15 pointer-events-none"></div>
+    <div className="min-h-[calc(100vh-76px)] bg-neobg flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="bg-grid-glow"></div>
+      
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-25 pointer-events-none"></div>
 
-      <div className="bg-neocard border-2 border-black max-w-md w-full p-6 md:p-8 shadow-neo relative z-10">
+      <div className="bg-white/[0.02] border border-white/5 max-w-md w-full p-8 rounded-2xl shadow-neo backdrop-blur-md relative z-10">
         {/* Card Header */}
-        <div className="mb-6 flex flex-col items-center">
-          <div className="bg-neocyan p-3 border-neo shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-3">
+        <div className="mb-8 flex flex-col items-center">
+          <div className="bg-gradient-to-br from-neogreen to-necyan p-3 rounded-xl border border-white/10 shadow-sm mb-3">
             <LogIn className="w-6 h-6 text-black" />
           </div>
-          <h2 className="font-mono text-2xl font-black text-white uppercase tracking-tight">OPERATOR SIGN-IN</h2>
-          <p className="text-zinc-500 text-xs font-mono uppercase mt-1">Authenticate console credentials</p>
+          <h2 className="font-sans text-xl font-bold text-white tracking-wide">Operator Sign-In</h2>
+          <p className="text-zinc-500 text-xs font-mono uppercase mt-1.5 tracking-wider">Authenticate console credentials</p>
         </div>
 
         {/* Error Notification */}
         {error && (
-          <div className="mb-6 p-4 border-neo bg-neopink/10 border-neopink text-neopink text-xs font-mono flex items-start gap-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            <ShieldAlert className="w-5 h-5 shrink-0" />
+          <div className="mb-6 p-4 rounded-xl border border-rose-500/25 bg-rose-500/5 text-rose-400 text-xs font-mono flex items-start gap-3 shadow-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-400" />
             <div>
               <span className="font-bold">AUTHENTICATION STATE FAILED:</span> {error}
             </div>
@@ -85,8 +87,8 @@ const Login = () => {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-1.5 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-neocyan" />
+            <label className="block text-[11px] font-semibold text-zinc-400 mb-2 tracking-wider flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-neogreen" />
               EMAIL ADDRESS
             </label>
             <input
@@ -95,13 +97,13 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="operator@system.io"
               disabled={loading}
-              className="w-full bg-neogray border-neo px-4 py-2.5 font-mono text-white placeholder-zinc-600 focus:outline-none focus:border-neocyan focus:shadow-[2px_2px_0px_0px_#00f0ff] transition-all disabled:opacity-50"
+              className="w-full bg-white/[0.01] border border-white/5 rounded-xl px-4 py-3 font-mono text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-neogreen/50 focus:ring-1 focus:ring-neogreen/25 transition-all disabled:opacity-50"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-1.5 flex items-center gap-1.5">
-              <Key className="w-3.5 h-3.5 text-neocyan" />
+            <label className="block text-[11px] font-semibold text-zinc-400 mb-2 tracking-wider flex items-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-neogreen" />
               PASSWORD KEY
             </label>
             <input
@@ -110,14 +112,14 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
               disabled={loading}
-              className="w-full bg-neogray border-neo px-4 py-2.5 font-mono text-white placeholder-zinc-600 focus:outline-none focus:border-neocyan focus:shadow-[2px_2px_0px_0px_#00f0ff] transition-all disabled:opacity-50"
+              className="w-full bg-white/[0.01] border border-white/5 rounded-xl px-4 py-3 font-mono text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-neogreen/50 focus:ring-1 focus:ring-neogreen/25 transition-all disabled:opacity-50"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 border-neo bg-neocyan text-black font-extrabold uppercase shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all duration-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-neogreen to-necyan text-black font-extrabold uppercase shadow-sm hover:opacity-90 active:scale-98 transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'SYNCING MATRIX DATA...' : 'INITIALIZE SYSTEM ACCESS'}
           </button>
@@ -125,8 +127,8 @@ const Login = () => {
 
         {/* Separator */}
         <div className="relative my-6 text-center">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-800"></div></div>
-          <span className="relative bg-neocard px-3 font-mono text-[10px] text-zinc-500 uppercase">OR VIA SECURE FEDERATION</span>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+          <span className="relative bg-[#0b0b11] px-3 font-mono text-[9px] text-zinc-500 uppercase tracking-widest">OR VIA SECURE FEDERATION</span>
         </div>
 
         {/* Google OAuth Login Button */}
@@ -134,7 +136,7 @@ const Login = () => {
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full py-3.5 border-neo bg-neogray text-white font-mono text-xs font-bold uppercase shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3.5 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10 text-white font-medium text-xs font-mono uppercase shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -146,9 +148,9 @@ const Login = () => {
         </button>
 
         {/* Switch Link */}
-        <div className="mt-6 pt-6 border-t border-zinc-800 text-center font-mono text-xs">
+        <div className="mt-6 pt-6 border-t border-white/5 text-center text-xs font-mono">
           <span className="text-zinc-500">NEW SYSTEM OPERATOR? </span>
-          <Link to="/register" className="text-neocyan font-bold hover:underline uppercase">
+          <Link to="/register" className="text-neogreen font-bold hover:underline uppercase tracking-wide">
             REGISTRATION STAGE
           </Link>
         </div>
