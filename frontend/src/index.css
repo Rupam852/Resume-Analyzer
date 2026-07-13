@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --color-neobg: #07070a;
+  --color-neocard: #121218;
+  --color-neogreen: #00ff66;
+  --color-neocyan: #00f0ff;
+  --color-neoyellow: #ffe600;
+  --color-neopink: #ff007f;
+  --color-neoborder: #000000;
+  --color-neogray: #1c1c24;
+}
+
+@utility border-neo {
+  border: 2px solid #000000;
+}
+
+@utility border-neo-neon {
+  border: 2px solid #00ff66;
+}
+
+@utility shadow-neo {
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+@utility shadow-neo-green {
+  box-shadow: 4px 4px 0px 0px #00ff66;
+}
+
+@utility shadow-neo-cyan {
+  box-shadow: 4px 4px 0px 0px #00f0ff;
+}
+
+@utility shadow-neo-yellow {
+  box-shadow: 4px 4px 0px 0px #ffe600;
+}
+
+@utility neo-btn {
+  @apply px-6 py-3 border-neo font-bold uppercase transition-all duration-150 cursor-pointer shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+}
+
+/* Custom Scrollbar for Neo Brutalist Aesthetic */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #07070a;
+  border-left: 2px solid #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c1c24;
+  border: 2px solid #000000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00ff66;
+}
+
+body {
+  background-color: #07070a;
+  color: #f4f4f5;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}

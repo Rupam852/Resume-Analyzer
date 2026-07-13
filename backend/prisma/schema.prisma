@@ -1,0 +1,37 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String           @id @default(uuid())
+  name          String
+  email         String           @unique
+  passwordHash  String
+  targetJobRole String
+  analyses      ResumeAnalysis[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model ResumeAnalysis {
+  id                     String   @id @default(uuid())
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName               String
+  atsScore               Int
+  targetJobDescription   String?  @db.Text
+  strengths              Json     // Stores array of strings
+  weaknesses             Json     // Stores array of strings
+  shortlistProbability   String
+  structuralImprovements Json     // Stores array of strings
+  missingKeywords        Json     // Stores array of strings
+  rawAiResponse          String   @db.Text
+  providerUsed           String
+  modelUsed              String
+  createdAt              DateTime @default(now())
+}

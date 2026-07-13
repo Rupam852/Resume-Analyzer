@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Local env files containing secrets
+.env
+backend/.env
+frontend/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+backend/dist/
+frontend/dist/
+
+# System and logs
+*.log
+.DS_Store
+.gemini/
+.agents/
+.system_generated/
