@@ -68,7 +68,7 @@ const Navbar = () => {
                 onClick={() => navigate('register')}
                 className="px-5 py-2.5 border-neo text-xs font-bold uppercase bg-neogreen text-black shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer"
               >
-                Access System
+                Sign Up
               </button>
             </>
           )}
