@@ -35,7 +35,11 @@ app.use(express.urlencoded({ extended: true }));
 // Health Check Endpoints
 app.get('/health', (req, res) => {
   const provider = process.env.AI_PROVIDER || 'gemini';
-  let model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-3.5-flash' : 'gpt-4o-mini');
+  let defaultModel = 'gemini-3.5-flash';
+  if (provider === 'openai') defaultModel = 'gpt-4o-mini';
+  else if (provider === 'groq') defaultModel = 'llama-3.3-70b-versatile';
+
+  let model = process.env.AI_MODEL_NAME || defaultModel;
   if (model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash') {
     model = 'gemini-3.5-flash';
   }

@@ -113,7 +113,33 @@ Return ONLY a raw JSON object matching the schema. No markdown wrapping.
     }
     return JSON.parse(text.trim());
 
+  } else if (provider === 'groq') {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error('GROQ_API_KEY environment variable is not configured');
+    }
+    
+    // Groq API has native OpenAI compatibility endpoint
+    const openai = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1'
+    });
+    
+    const model = modelName || 'llama-3.3-70b-versatile';
+    console.log(`[AI Engine] Attempting resume analysis via Groq using model: ${model}`);
+
+    const completion = await openai.chat.completions.create({
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: "json_object" }
+    });
+
+    const text = completion.choices?.[0]?.message?.content;
+    if (!text) {
+      throw new Error('Failed to retrieve content from Groq API');
+    }
+    return JSON.parse(text.trim());
+
   } else {
-    throw new Error(`Unsupported AI_PROVIDER: ${provider}. Supported options are "gemini" or "openai".`);
+    throw new Error(`Unsupported AI_PROVIDER: ${provider}. Supported options are "gemini", "openai" or "groq".`);
   }
 }
