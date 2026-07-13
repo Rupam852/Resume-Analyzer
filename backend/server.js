@@ -37,6 +37,15 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/resume', analyzeRoutes);
 
+// Fallback handlers to capture Google OAuth requests that skip the /api/auth prefix
+app.get('/google', (req, res) => {
+  res.redirect('/api/auth/google');
+});
+app.get('/google/callback', (req, res) => {
+  const queryParams = new URLSearchParams(req.query).toString();
+  res.redirect(`/api/auth/google/callback?${queryParams}`);
+});
+
 // Fallback Route Handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
