@@ -9,7 +9,12 @@ import OpenAI from 'openai';
  */
 export async function analyzeResumeWithAI(resumeText, jobDescription) {
   const provider = process.env.AI_PROVIDER || 'gemini';
-  const modelName = process.env.AI_MODEL_NAME;
+  let modelName = process.env.AI_MODEL_NAME;
+
+  // Override deprecated/invalid model names automatically
+  if (modelName === 'gemini-2.5-flash') {
+    modelName = 'gemini-1.5-flash';
+  }
 
   const prompt = `
 You are an expert Applicant Tracking System (ATS) and professional resume reviewer.
