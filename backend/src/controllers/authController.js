@@ -147,7 +147,12 @@ export function googleRedirect(req, res) {
 export async function googleCallback(req, res) {
   try {
     const { code } = req.query;
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    
+    // Automatically sanitize and ensure absolute URL protocol
+    if (!frontendUrl.startsWith('http://') && !frontendUrl.startsWith('https://')) {
+      frontendUrl = `https://${frontendUrl}`;
+    }
 
     if (!code) {
       return res.redirect(`${frontendUrl}/login?error=Google auth authorization code was missing.`);
@@ -226,6 +231,6 @@ export async function googleCallback(req, res) {
     res.redirect(`${frontendUrl}/login?token=${token}`);
   } catch (error) {
     console.error('Google OAuth callback error:', error);
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=Internal OAuth processing error.`);
+    res.redirect(`${frontendUrl}/login?error=Internal OAuth processing error.`);
   }
 }
