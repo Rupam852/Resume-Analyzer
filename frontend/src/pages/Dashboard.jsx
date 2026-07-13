@@ -12,16 +12,18 @@ import {
   BrainCircuit, 
   CheckCircle2,
   FileSpreadsheet,
-  FileCode
+  FileCode,
+  Globe
 } from 'lucide-react';
 
 const Dashboard = () => {
   const { token, getAuthHeaders, API_URL, user } = useContext(AuthContext);
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'text'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'text', or 'link'
   const [file, setFile] = useState(null);
   const [rawResumeText, setRawResumeText] = useState('');
+  const [portfolioUrl, setPortfolioUrl] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -121,12 +123,18 @@ const Dashboard = () => {
       setError('Please paste your resume text in the field below.');
       return;
     }
+    if (activeTab === 'link' && !portfolioUrl.trim()) {
+      setError('Please enter your portfolio website link to analyze.');
+      return;
+    }
 
     setLoading(true);
 
     const formData = new FormData();
     if (activeTab === 'upload') {
       formData.append('resume', file);
+    } else if (activeTab === 'link') {
+      formData.append('portfolioUrl', portfolioUrl);
     } else {
       formData.append('rawResumeText', rawResumeText);
     }
@@ -174,11 +182,11 @@ const Dashboard = () => {
               ANALYSIS INITIATION CONSOLE
             </h2>
             <p className="text-zinc-400 text-xs font-mono mb-6 uppercase">
-              FEED RESUME BYTES OR TEXT MATRICES TO SCANNER
+              FEED RESUME BYTES, TEXT OR WEBPAGE VECTORS TO SCANNER
             </p>
 
             {/* Ingestion Method Tabs */}
-            <div className="grid grid-cols-2 gap-2 p-1.5 bg-neogray border-neo border-2 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-neogray border-neo border-2 mb-6">
               <button
                 type="button"
                 onClick={() => { setActiveTab('upload'); setError(''); }}
@@ -201,7 +209,19 @@ const Dashboard = () => {
                 }`}
               >
                 <FileCode className="w-3.5 h-3.5 inline mr-1.5" />
-                Paste Resume Text
+                Paste Text
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('link'); setError(''); }}
+                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                  activeTab === 'link'
+                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5 inline mr-1.5" />
+                Portfolio Link
               </button>
             </div>
 
@@ -216,7 +236,7 @@ const Dashboard = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Conditional Ingestion Zone */}
-              {activeTab === 'upload' ? (
+              {activeTab === 'upload' && (
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
                     1. RESUME FILE (PDF, JPG, JPEG, PNG - MAX 10MB)
@@ -260,13 +280,15 @@ const Dashboard = () => {
                           Drag & Drop File or Click to Select
                         </p>
                         <p className="text-[10px] text-zinc-500 mt-2 uppercase">
-                          Supports text PDFs or clear high-contrast images (JPG, PNG)
+                          Supports text PDFs or clean high-contrast images (JPG, PNG)
                         </p>
                       </div>
                     )}
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {activeTab === 'text' && (
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
                     1. PASTE YOUR RESUME TEXT
@@ -278,6 +300,24 @@ const Dashboard = () => {
                     rows={10}
                     className="w-full bg-neogray border-neo p-4 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all resize-y"
                   />
+                </div>
+              )}
+
+              {activeTab === 'link' && (
+                <div>
+                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
+                    1. ENTER PORTFOLIO WEBSITE LINK
+                  </label>
+                  <input
+                    type="text"
+                    value={portfolioUrl}
+                    onChange={(e) => setPortfolioUrl(e.target.value)}
+                    placeholder="https://your-portfolio-website.com"
+                    className="w-full bg-neogray border-neo px-4 py-3.5 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all"
+                  />
+                  <p className="text-[10px] text-zinc-500 mt-2.5 uppercase font-mono">
+                    System web crawler will fetch readable text bio, projects, and work info from this link.
+                  </p>
                 </div>
               )}
 

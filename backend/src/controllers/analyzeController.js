@@ -4,13 +4,40 @@ import prisma from '../config/db.js';
 import { analyzeResumeWithAI } from '../utils/aiAnalyzer.js';
 
 /**
- * Handle uploading, parsing (PDF/Image OCR), and analyzing a resume.
+ * Strips HTML tags, scripts, styles, and extracts readable text.
+ */
+function extractTextFromHtml(html) {
+  // 1. Remove script and style elements
+  let text = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+  text = text.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '');
+  // 2. Remove HTML comments
+  text = text.replace(/<!--[\s\S]*?-->/g, '');
+  // 3. Replace common block tags with newlines
+  text = text.replace(/<\/p>|<\/div>|<\/h1>|<\/h2>|<\/h3>|<\/h4>|<\/h5>|<\/h6>|<\/li>|<\/tr>/g, '\n');
+  // 4. Remove all remaining HTML tags
+  text = text.replace(/<[^>]+>/g, ' ');
+  // 5. Unescape HTML entities
+  text = text.replace(/&nbsp;/g, ' ')
+             .replace(/&amp;/g, '&')
+             .replace(/&lt;/g, '<')
+             .replace(/&gt;/g, '>')
+             .replace(/&quot;/g, '"');
+  // 6. Clean up white spaces and lines
+  text = text.split('\n')
+             .map(line => line.trim())
+             .filter(line => line.length > 0)
+             .join('\n');
+  return text;
+}
+
+/**
+ * Handle uploading, parsing (PDF/Image OCR/URL Scraper), and analyzing a resume.
  */
 export async function analyzeResume(req, res) {
   try {
-    const { jobDescription, rawResumeText } = req.body;
+    const { jobDescription, rawResumeText, portfolioUrl } = req.body;
     let resumeText = '';
-    let fileName = 'Pasted Resume Text';
+    let fileName = 'Portfolio Link Analysis';
 
     if (req.file) {
       const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -44,25 +71,51 @@ export async function analyzeResume(req, res) {
         }
         resumeText = pdfData.text;
       }
+    } else if (portfolioUrl && portfolioUrl.trim().length > 0) {
+      // URL Scraping Ingestion
+      let targetUrl = portfolioUrl.trim();
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = `https://${targetUrl}`;
+      }
+
+      try {
+        fileName = new URL(targetUrl).hostname;
+      } catch (_) {
+        return res.status(400).json({ error: 'Invalid portfolio website link format' });
+      }
+
+      console.log(`[Scraper] Fetching text vectors from: ${targetUrl}`);
+      try {
+        const response = await fetch(targetUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          }
+        });
+        if (!response.ok) {
+          return res.status(400).json({ error: `Target URL returned server error: ${response.status}` });
+        }
+        const html = await response.text();
+        resumeText = extractTextFromHtml(html);
+      } catch (scrapeError) {
+        console.error('Web scraper connection failed:', scrapeError);
+        return res.status(400).json({ error: 'Web crawler failed to connect. Make sure the website is public and active.' });
+      }
     } else if (rawResumeText && rawResumeText.trim().length > 0) {
       resumeText = rawResumeText;
     } else {
-      return res.status(400).json({ error: 'Please upload a PDF/Image resume file or paste your resume text.' });
+      return res.status(400).json({ error: 'Please upload a PDF/Image, paste text, or provide a portfolio link.' });
     }
 
-    // Verify extracted text is not empty
+    // Verify extracted/scraped text is not empty
     if (!resumeText || resumeText.trim().length === 0) {
       return res.status(400).json({ 
-        error: 'The uploaded file appears to be empty or does not contain readable text. Please try pasting the text instead.' 
+        error: 'No readable text could be found in the provided resume source. Please try copying and pasting it.' 
       });
     }
 
     // Call dynamic AI analyzer engine
     const provider = process.env.AI_PROVIDER || 'gemini';
-    let model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-3.5-flash' : 'gpt-4o-mini');
-    if (model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash') {
-      model = 'gemini-3.5-flash';
-    }
+    const model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-3.5-flash' : 'gpt-4o-mini');
 
     let analysisResult;
     try {
