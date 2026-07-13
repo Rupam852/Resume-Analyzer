@@ -34,10 +34,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health Check Endpoints
 app.get('/health', (req, res) => {
+  const provider = process.env.AI_PROVIDER || 'gemini';
+  let model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4o-mini');
+  if (model === 'gemini-2.5-flash') {
+    model = 'gemini-1.5-flash';
+  }
   res.json({
     status: 'online',
-    provider: process.env.AI_PROVIDER || 'gemini',
-    model: process.env.AI_MODEL_NAME || 'gemini-1.5-flash',
+    provider: provider,
+    model: model,
     time: new Date().toISOString()
   });
 });
