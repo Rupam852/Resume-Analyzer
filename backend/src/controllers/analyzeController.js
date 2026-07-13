@@ -59,7 +59,7 @@ export async function analyzeResume(req, res) {
 
     // Call dynamic AI analyzer engine
     const provider = process.env.AI_PROVIDER || 'gemini';
-    const model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini');
+    const model = process.env.AI_MODEL_NAME || (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4o-mini');
 
     let analysisResult;
     try {

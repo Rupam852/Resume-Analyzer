@@ -39,7 +39,7 @@ Return ONLY a raw JSON object matching the schema. No markdown wrapping.
       throw new Error('GEMINI_API_KEY environment variable is not configured');
     }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const model = modelName || 'gemini-2.5-flash';
+    const model = modelName || 'gemini-1.5-flash';
 
     const responseSchema = {
       type: "OBJECT",

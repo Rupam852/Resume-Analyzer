@@ -37,7 +37,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'online',
     provider: process.env.AI_PROVIDER || 'gemini',
-    model: process.env.AI_MODEL_NAME || 'gemini-2.5-flash',
+    model: process.env.AI_MODEL_NAME || 'gemini-1.5-flash',
     time: new Date().toISOString()
   });
 });
@@ -72,6 +72,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server is active on port: ${PORT}`);
   console.log(`🔗 Allowed CORS origin: ${frontendUrl}`);
   console.log(`🧠 Dynamic AI Provider: ${process.env.AI_PROVIDER || 'gemini'}`);
-  console.log(`🤖 Dynamic AI Model Name: ${process.env.AI_MODEL_NAME || 'gemini-2.5-flash'}`);
+  console.log(`🤖 Dynamic AI Model Name: ${process.env.AI_MODEL_NAME || 'gemini-1.5-flash'}`);
   console.log(`=============================================`);
 });
