@@ -91,6 +91,21 @@ const ResultsView = () => {
   const structuralImprovements = parseJsonArray(analysis.structuralImprovements);
   const missingKeywords = parseJsonArray(analysis.missingKeywords);
 
+  // Parse raw response for red flags and impact scores (backwards compatible)
+  let rawResponse = {};
+  try {
+    if (analysis.rawAiResponse) {
+      rawResponse = JSON.parse(analysis.rawAiResponse);
+    }
+  } catch (err) {
+    console.error('Failed to parse raw AI response:', err);
+  }
+
+  const redFlags = parseJsonArray(rawResponse.redFlags);
+  const quantifiableImpactScore = rawResponse.quantifiableImpactScore !== undefined 
+    ? rawResponse.quantifiableImpactScore 
+    : 0;
+
   // Score metrics
   const score = analysis.atsScore;
   let scoreColor = '#f43f5e'; // rose-500
@@ -108,6 +123,24 @@ const ResultsView = () => {
     scoreBg = 'bg-amber-500/5';
     scoreBorder = 'border-amber-500/20';
     scoreText = 'text-amber-400';
+  }
+
+  // Impact metrics
+  let impactColor = '#f43f5e'; // rose-500
+  let impactBg = 'bg-rose-500/5';
+  let impactBorder = 'border-rose-500/20';
+  let impactText = 'text-rose-400';
+
+  if (quantifiableImpactScore >= 80) {
+    impactColor = '#10b981'; // emerald-500
+    impactBg = 'bg-emerald-500/5';
+    impactBorder = 'border-emerald-500/20';
+    impactText = 'text-emerald-400';
+  } else if (quantifiableImpactScore >= 50) {
+    impactColor = '#f59e0b'; // amber-500
+    impactBg = 'bg-amber-500/5';
+    impactBorder = 'border-amber-500/20';
+    impactText = 'text-amber-400';
   }
 
   // Calculate SVG circular arc gauge params
@@ -200,14 +233,29 @@ const ResultsView = () => {
 
           {/* Probability Indicator / Badge */}
           <div className="md:col-span-2 space-y-4">
-            <div>
-              <span className="font-mono text-[9px] font-semibold text-zinc-500 uppercase tracking-widest block mb-2">
-                ESTIMATED SHORTLIST ODDS
-              </span>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${scoreBorder} ${scoreBg} text-white text-sm font-semibold shadow-sm uppercase`}>
-                <Award className="w-5 h-5 shrink-0" style={{ color: scoreColor }} />
-                <span>{analysis.shortlistProbability}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <span className="font-mono text-[9px] font-semibold text-zinc-500 uppercase tracking-widest block mb-2">
+                  ESTIMATED SHORTLIST ODDS
+                </span>
+                <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border ${scoreBorder} ${scoreBg} text-white text-xs font-semibold shadow-sm uppercase`}>
+                  <Award className="w-4.5 h-4.5 shrink-0" style={{ color: scoreColor }} />
+                  <span>{analysis.shortlistProbability}</span>
+                </div>
               </div>
+
+              {quantifiableImpactScore > 0 && (
+                <div>
+                  <span className="font-mono text-[9px] font-semibold text-zinc-500 uppercase tracking-widest block mb-2">
+                    QUANTIFIABLE IMPACT MATCH
+                  </span>
+                  <div className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border ${impactBorder} ${impactBg} text-white text-xs font-semibold shadow-sm uppercase`}>
+                    <TrendingUp className="w-4 h-4 shrink-0 font-bold" style={{ color: impactColor }} />
+                    <span className={`${impactText} font-mono font-bold mr-1`}>{quantifiableImpactScore}%</span>
+                    <span className="text-zinc-300">Metrics Coverage</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="pt-1">
@@ -226,6 +274,21 @@ const ResultsView = () => {
           </div>
 
         </div>
+
+        {/* Red Flags Alert Box */}
+        {redFlags && redFlags.length > 0 && (
+          <div className="bg-rose-500/5 border border-rose-500/15 p-5 rounded-2xl shadow-sm space-y-2">
+            <div className="font-bold flex items-center gap-2 uppercase tracking-wide text-rose-400 text-xs font-mono">
+              <AlertTriangle className="w-4.5 h-4.5 text-rose-400 shrink-0 animate-pulse" />
+              Critical ATS Red Flags Detected
+            </div>
+            <ul className="list-disc pl-5 space-y-1.5 font-sans font-light text-zinc-300 text-xs md:text-sm">
+              {redFlags.map((flag, idx) => (
+                <li key={idx} className="leading-relaxed">{flag}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Feature Columns: Strengths and Weaknesses */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

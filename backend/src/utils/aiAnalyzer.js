@@ -35,6 +35,8 @@ Analyze the resume and return a JSON object with the following fields:
 - shortlistProbability (string): Estimated shortlist odds, e.g., "High (Around 85% compatibility)" or "Medium-Low (Around 40% compatibility)".
 - structuralImprovements (array of strings): 2-4 actionable structural or formatting improvements.
 - missingKeywords (array of strings): 3-6 keywords or technologies that are missing but critical/helpful.
+- redFlags (array of strings): 1-3 critical warnings or red flags (e.g., "No email address found", "Lack of quantifiable metrics/numbers", "Tables detected which might break parsing").
+- quantifiableImpactScore (integer from 0 to 100): A rating evaluating if achievements are supported by data, percentages, or measurable success.
 
 Return ONLY a raw JSON object matching the schema. No markdown wrapping.
 `;
@@ -53,9 +55,20 @@ Return ONLY a raw JSON object matching the schema. No markdown wrapping.
         weaknesses: { type: "ARRAY", items: { type: "STRING" } },
         shortlistProbability: { type: "STRING" },
         structuralImprovements: { type: "ARRAY", items: { type: "STRING" } },
-        missingKeywords: { type: "ARRAY", items: { type: "STRING" } }
+        missingKeywords: { type: "ARRAY", items: { type: "STRING" } },
+        redFlags: { type: "ARRAY", items: { type: "STRING" } },
+        quantifiableImpactScore: { type: "INTEGER" }
       },
-      required: ["atsScore", "strengths", "weaknesses", "shortlistProbability", "structuralImprovements", "missingKeywords"]
+      required: [
+        "atsScore", 
+        "strengths", 
+        "weaknesses", 
+        "shortlistProbability", 
+        "structuralImprovements", 
+        "missingKeywords", 
+        "redFlags", 
+        "quantifiableImpactScore"
+      ]
     };
 
     // Sequential fallback list in case the primary model is overloaded (503 Service Unavailable)

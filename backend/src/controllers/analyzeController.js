@@ -132,10 +132,21 @@ export async function analyzeResume(req, res) {
       weaknesses,
       shortlistProbability,
       structuralImprovements,
-      missingKeywords
+      missingKeywords,
+      redFlags,
+      quantifiableImpactScore
     } = analysisResult;
 
-    if (atsScore === undefined || !strengths || !weaknesses || !shortlistProbability || !structuralImprovements || !missingKeywords) {
+    if (
+      atsScore === undefined || 
+      !strengths || 
+      !weaknesses || 
+      !shortlistProbability || 
+      !structuralImprovements || 
+      !missingKeywords || 
+      !redFlags || 
+      quantifiableImpactScore === undefined
+    ) {
       console.error('AI response did not conform to schema:', analysisResult);
       return res.status(502).json({ error: 'AI analysis returned an invalid JSON response structure' });
     }
