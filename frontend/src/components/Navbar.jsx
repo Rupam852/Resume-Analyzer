@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
-import { LogOut, LayoutDashboard, Terminal } from 'lucide-react';
+import { LogOut, Terminal } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -29,13 +29,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-              <Link
-                to="/dashboard"
-                className="hidden sm:flex items-center gap-2 px-4 py-2 border-neo text-xs font-bold uppercase bg-neogray text-white shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
-              >
-                <LayoutDashboard className="w-4 h-4 text-neocyan" />
-                Console
-              </Link>
+
               <div className="hidden md:flex flex-col text-right font-mono text-[10px] leading-tight">
                 <span className="text-zinc-400 font-bold">AGENT: {user.name.toUpperCase()}</span>
                 <span className="text-neogreen tracking-wider">{user.targetJobRole.toUpperCase()}</span>
