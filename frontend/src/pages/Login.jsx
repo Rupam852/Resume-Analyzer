@@ -10,8 +10,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
 
-  const { login, loginWithToken, API_URL } = useContext(AuthContext);
+  const { login, loginWithToken, API_URL, user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   // Detect Google OAuth Redirect Parameters
   useEffect(() => {
@@ -48,7 +55,6 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // Redirect browser to backend Google OAuth initiation route
     window.location.href = `${API_URL}/api/auth/google`;
   };
 
