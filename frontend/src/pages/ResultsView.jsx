@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axiosInstance from 'axios';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { 
   ArrowLeft, 
@@ -24,7 +24,7 @@ const ResultsView = () => {
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
-        const response = await axiosInstance.get(`${API_URL}/api/resume/${id}`, getAuthHeaders());
+        const response = await axios.get(`${API_URL}/api/resume/${id}`, getAuthHeaders());
         setAnalysis(response.data);
       } catch (err) {
         console.error('Failed to load analysis results:', err);

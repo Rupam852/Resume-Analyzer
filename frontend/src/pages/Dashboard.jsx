@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'react-serif'; // Wait, let's keep axios!
-import axiosInstance from 'axios';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { 
   Upload, 
@@ -39,7 +38,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHistoryAndEngine = async () => {
       try {
-        const historyRes = await axiosInstance.get(`${API_URL}/api/resume/history`, getAuthHeaders());
+        const historyRes = await axios.get(`${API_URL}/api/resume/history`, getAuthHeaders());
         setHistory(historyRes.data);
       } catch (err) {
         console.error('Failed to load history:', err);
@@ -48,7 +47,7 @@ const Dashboard = () => {
       }
 
       try {
-        const healthRes = await axiosInstance.get(`${API_URL}/health`);
+        const healthRes = await axios.get(`${API_URL}/health`);
         setActiveEngine({
           provider: healthRes.data.provider,
           model: healthRes.data.model
@@ -142,7 +141,7 @@ const Dashboard = () => {
     formData.append('jobDescription', jobDescription);
 
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         `${API_URL}/api/resume/analyze`, 
         formData, 
         {
