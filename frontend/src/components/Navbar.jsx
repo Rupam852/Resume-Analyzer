@@ -29,7 +29,21 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-
+              <div className="flex items-center gap-2.5 px-3 py-1.5 border-neo bg-neogray font-mono text-xs shadow-[2px_2px_0px_0px_#000] text-white">
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    referrerPolicy="no-referrer"
+                    className="w-6 h-6 rounded-full border border-black object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full border border-black bg-neocyan text-black flex items-center justify-center font-bold text-[10px]">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="hidden sm:inline font-bold">{user.name.toUpperCase()}</span>
+              </div>
 
               <button
                 onClick={handleLogout}

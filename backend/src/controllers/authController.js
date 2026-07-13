@@ -117,7 +117,8 @@ export async function getProfile(req, res) {
       id: user.id,
       name: user.name,
       email: user.email,
-      targetJobRole: user.targetJobRole
+      targetJobRole: user.targetJobRole,
+      avatar: user.avatar
     });
   } catch (error) {
     console.error('Profile fetch error:', error);
@@ -195,7 +196,7 @@ export async function googleCallback(req, res) {
     }
 
     const profileData = await profileResponse.json();
-    const { email, name } = profileData;
+    const { email, name, picture } = profileData;
 
     if (!email) {
       return res.redirect(`${frontendUrl}/login?error=No email profile returned from Google OAuth.`);
@@ -206,7 +207,15 @@ export async function googleCallback(req, res) {
       where: { email: email.toLowerCase() }
     });
 
-    if (!user) {
+    if (user) {
+      // Keep Google avatar synchronized in DB if changed
+      if (picture && user.avatar !== picture) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { avatar: picture }
+        });
+      }
+    } else {
       // Auto-register the Google authenticated user with a randomized password hash
       const randomPassword = Math.random().toString(36).slice(-10);
       const passwordHash = await bcrypt.hash(randomPassword, 10);
@@ -215,7 +224,8 @@ export async function googleCallback(req, res) {
           name: name || 'Google User',
           email: email.toLowerCase(),
           passwordHash,
-          targetJobRole: 'Software Engineer' // Default placeholder role
+          targetJobRole: 'Software Engineer', // Default placeholder role
+          avatar: picture || null
         }
       });
     }
