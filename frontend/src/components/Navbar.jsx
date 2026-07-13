@@ -20,8 +20,8 @@ const Navbar = () => {
           <div className="bg-neogreen p-1.5 border-neo shadow-[2px_2px_0px_0px_#000000] group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none transition-all">
             <Terminal className="w-5 h-5 text-black" />
           </div>
-          <span className="font-mono text-xl font-extrabold uppercase tracking-wider text-white">
-            ANTIVIRAL<span className="text-neogreen">.AI</span>
+          <span className="font-mono text-lg font-extrabold uppercase tracking-wider text-white">
+            RESUME ANALYZER<span className="text-neogreen">.AI</span>
           </span>
         </Link>
 

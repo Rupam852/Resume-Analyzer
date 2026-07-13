@@ -104,7 +104,7 @@ const LandingPage = () => {
       {/* Cyber Footer */}
       <footer className="w-full bg-neocard border-t-2 border-neoborder py-6 z-10">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center justify-between font-mono text-[10px] text-zinc-500">
-          <span className="uppercase">© 2026 ANTIVIRAL.AI - ALL SYSTEMS OPERATIONAL</span>
+          <span className="uppercase">© 2026 RESUME ANALYZER.AI - ALL SYSTEMS OPERATIONAL</span>
           <span className="uppercase tracking-widest text-neogreen mt-2 md:mt-0">SECURE SHELL PROTOCOL ACTIVE</span>
         </div>
       </footer>
