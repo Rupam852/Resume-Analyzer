@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { ShieldAlert, UserPlus, User, Mail, Key, Briefcase } from 'lucide-react';
 
@@ -11,15 +10,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register, API_URL, user } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  // Redirect if user is already authenticated
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
+  const { register, API_URL, navigate } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,9 +26,7 @@ const Register = () => {
     const result = await register(name, email, password, targetJobRole);
     setLoading(false);
 
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
+    if (!result.success) {
       setError(result.error);
     }
   };
@@ -168,9 +157,12 @@ const Register = () => {
         {/* Switch Link */}
         <div className="mt-6 pt-6 border-t border-white/5 text-center text-xs font-mono">
           <span className="text-zinc-500">ALREADY HAVE OPERATOR DATA? </span>
-          <Link to="/login" className="text-neogreen font-bold hover:underline uppercase tracking-wide">
+          <button 
+            onClick={() => navigate('login')} 
+            className="text-neogreen font-bold hover:underline uppercase tracking-wide cursor-pointer bg-transparent border-none outline-none"
+          >
             SIGN-IN CORE
-          </Link>
+          </button>
         </div>
       </div>
     </div>

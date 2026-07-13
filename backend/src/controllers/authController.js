@@ -156,7 +156,7 @@ export async function googleCallback(req, res) {
     }
 
     if (!code) {
-      return res.redirect(`${frontendUrl}/login?error=Google auth authorization code was missing.`);
+      return res.redirect(`${frontendUrl}/?error=Google auth authorization code was missing.`);
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -179,7 +179,7 @@ export async function googleCallback(req, res) {
     if (!tokenResponse.ok) {
       const errorDetails = await tokenResponse.text();
       console.error('Failed to exchange Google OAuth code:', errorDetails);
-      return res.redirect(`${frontendUrl}/login?error=Google authentication token exchange failed.`);
+      return res.redirect(`${frontendUrl}/?error=Google authentication token exchange failed.`);
     }
 
     const tokenData = await tokenResponse.json();
@@ -192,14 +192,14 @@ export async function googleCallback(req, res) {
 
     if (!profileResponse.ok) {
       console.error('Failed to retrieve user profile from Google API');
-      return res.redirect(`${frontendUrl}/login?error=Failed to retrieve user profile from Google.`);
+      return res.redirect(`${frontendUrl}/?error=Failed to retrieve user profile from Google.`);
     }
 
     const profileData = await profileResponse.json();
     const { email, name, picture } = profileData;
 
     if (!email) {
-      return res.redirect(`${frontendUrl}/login?error=No email profile returned from Google OAuth.`);
+      return res.redirect(`${frontendUrl}/?error=No email profile returned from Google OAuth.`);
     }
 
     // Check database for user profile
@@ -238,9 +238,9 @@ export async function googleCallback(req, res) {
     );
 
     // Redirect to frontend login with query param
-    res.redirect(`${frontendUrl}/login?token=${token}`);
+    res.redirect(`${frontendUrl}/?token=${token}`);
   } catch (error) {
     console.error('Google OAuth callback error:', error);
-    res.redirect(`${frontendUrl}/login?error=Internal OAuth processing error.`);
+    res.redirect(`${frontendUrl}/?error=Internal OAuth processing error.`);
   }
 }

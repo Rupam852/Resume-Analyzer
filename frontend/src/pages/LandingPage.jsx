@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { Terminal, ShieldAlert, Cpu, Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 
 const LandingPage = () => {
-  const { user } = useContext(AuthContext);
+  const { user, navigate } = useContext(AuthContext);
 
   const features = [
     {
@@ -65,13 +64,13 @@ const LandingPage = () => {
 
         {/* Large Elegant CTA */}
         <div className="mt-10 mb-24">
-          <Link
-            to={user ? "/dashboard" : "/register"}
+          <button
+            onClick={() => navigate(user ? 'dashboard' : 'register')}
             className="group relative inline-flex items-center gap-3 px-8 py-4.5 rounded-xl border border-white/10 text-base md:text-lg font-bold bg-gradient-to-r from-neogreen to-necyan text-black shadow-lg shadow-neogreen/15 hover:shadow-xl hover:shadow-neogreen/25 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
           >
             Scan Your Resume Now
             <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          </button>
         </div>
 
         {/* Separator Line */}

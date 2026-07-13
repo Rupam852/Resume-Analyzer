@@ -7,14 +7,40 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const [screen, setScreen] = useState('landing');
+  const [params, setParams] = useState({});
+
+  const navigate = (targetScreen, targetParams = {}) => {
+    setScreen(targetScreen);
+    setParams(targetParams);
+  };
 
   const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+  // Detect Google OAuth redirect parameters on load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthToken = urlParams.get('token');
+    const oauthError = urlParams.get('error');
+
+    if (oauthToken) {
+      localStorage.setItem('token', oauthToken);
+      setToken(oauthToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (oauthError) {
+      console.error('Google OAuth authentication failed:', oauthError);
+      setScreen('login');
+      alert(`Google Authentication Error: ${decodeURIComponent(oauthError)}`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
       if (!token) {
         setUser(null);
+        setScreen('landing');
         setLoading(false);
         return;
       }
@@ -24,6 +50,7 @@ export const AuthProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data);
+        setScreen('dashboard');
       } catch (err) {
         console.error('Failed to sync authentication profile:', err);
         logout();
@@ -42,6 +69,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(newUser);
+      setScreen('dashboard');
       return { success: true };
     } catch (err) {
       console.error('Login action error:', err);
@@ -64,6 +92,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(newUser);
+      setScreen('dashboard');
       return { success: true };
     } catch (err) {
       console.error('Register action error:', err);
@@ -77,12 +106,14 @@ export const AuthProvider = ({ children }) => {
   const loginWithToken = (newToken) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
+    setScreen('dashboard');
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    setScreen('landing');
   };
 
   const getAuthHeaders = () => {
@@ -92,7 +123,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, getAuthHeaders, API_URL, loginWithToken }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, getAuthHeaders, API_URL, loginWithToken, screen, params, navigate }}>
       {children}
     </AuthContext.Provider>
   );

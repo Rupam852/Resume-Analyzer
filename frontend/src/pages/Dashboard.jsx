@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { 
@@ -18,8 +17,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { token, getAuthHeaders, API_URL, user } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { token, getAuthHeaders, API_URL, user, navigate } = useContext(AuthContext);
   
   const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'text', or 'link'
   const [file, setFile] = useState(null);
@@ -154,7 +152,7 @@ const Dashboard = () => {
       );
       
       // Navigate to results view
-      navigate(`/results/${response.data.id}`);
+      navigate('results', { id: response.data.id });
     } catch (err) {
       console.error('Analysis submission failed:', err);
       setError(
@@ -394,7 +392,7 @@ const Dashboard = () => {
                     className="p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/10 transition-all flex items-center justify-between group shadow-sm"
                   >
                     <div 
-                      onClick={() => navigate(`/results/${item.id}`)}
+                      onClick={() => navigate('results', { id: item.id })}
                       className="min-w-0 pr-3 flex-grow cursor-pointer"
                     >
                       <h4 className="font-semibold text-xs text-white truncate max-w-[150px]">

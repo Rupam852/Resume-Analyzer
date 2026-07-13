@@ -1,5 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { ShieldAlert, LogIn, Mail, Key } from 'lucide-react';
 
@@ -8,30 +7,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [searchParams] = useSearchParams();
 
-  const { login, loginWithToken, API_URL, user } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  // Redirect if user is already authenticated
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
-
-  // Detect Google OAuth Redirect Parameters
-  useEffect(() => {
-    const token = searchParams.get('token');
-    const oauthError = searchParams.get('error');
-
-    if (token) {
-      loginWithToken(token);
-      navigate('/dashboard');
-    } else if (oauthError) {
-      setError(decodeURIComponent(oauthError));
-    }
-  }, [searchParams, loginWithToken, navigate]);
+  const { login, API_URL, navigate } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,9 +24,7 @@ const Login = () => {
     const result = await login(email, password);
     setLoading(false);
 
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
+    if (!result.success) {
       setError(result.error);
     }
   };
@@ -150,9 +125,12 @@ const Login = () => {
         {/* Switch Link */}
         <div className="mt-6 pt-6 border-t border-white/5 text-center text-xs font-mono">
           <span className="text-zinc-500">NEW SYSTEM OPERATOR? </span>
-          <Link to="/register" className="text-neogreen font-bold hover:underline uppercase tracking-wide">
+          <button 
+            onClick={() => navigate('register')} 
+            className="text-neogreen font-bold hover:underline uppercase tracking-wide cursor-pointer bg-transparent border-none outline-none"
+          >
             REGISTRATION STAGE
-          </Link>
+          </button>
         </div>
       </div>
     </div>

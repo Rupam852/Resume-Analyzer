@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { 
@@ -15,8 +14,8 @@ import {
 } from 'lucide-react';
 
 const ResultsView = () => {
-  const { id } = useParams();
-  const { getAuthHeaders, API_URL } = useContext(AuthContext);
+  const { getAuthHeaders, API_URL, navigate, params } = useContext(AuthContext);
+  const id = params.id;
 
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,13 +62,13 @@ const ResultsView = () => {
           <p className="text-zinc-500 text-xs leading-relaxed mb-6 font-mono uppercase">
             {error || 'The requested analysis record is inaccessible or does not exist.'}
           </p>
-          <Link
-            to="/dashboard"
+          <button
+            onClick={() => navigate('dashboard')}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-white/10 bg-gradient-to-r from-neogreen to-necyan text-black font-semibold text-xs uppercase shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Return to Console
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -158,12 +157,12 @@ const ResultsView = () => {
         {/* Navigation & Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6">
           <div className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
+            <button
+              onClick={() => navigate('dashboard')}
               className="p-3 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] text-white shadow-sm transition-all cursor-pointer shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
-            </Link>
+            </button>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <FileText className="w-3.5 h-3.5 text-zinc-500" />
