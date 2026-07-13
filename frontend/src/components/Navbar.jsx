@@ -36,7 +36,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 px-4 py-2 border-neo text-xs font-bold uppercase bg-neopink text-black shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
-                Disconnect
+                Sign Out
               </button>
             </>
           ) : (
