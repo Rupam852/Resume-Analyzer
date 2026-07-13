@@ -88,13 +88,17 @@ const Dashboard = () => {
 
   const validateAndSetFile = (selectedFile) => {
     setError('');
-    if (selectedFile.type !== 'application/pdf') {
-      setError('System restricted: Only standard PDF files are supported.');
+    
+    // Support PDF and standard image MIME types
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setError('System restricted: Only standard PDF, JPG, JPEG, and PNG images are supported.');
       setFile(null);
       return;
     }
     if (selectedFile.size > 10 * 1024 * 1024) {
-      setError('System restricted: PDF exceeds 10MB memory allocation.');
+      setError('System restricted: File exceeds 10MB memory allocation.');
       setFile(null);
       return;
     }
@@ -110,7 +114,7 @@ const Dashboard = () => {
     setError('');
     
     if (activeTab === 'upload' && !file) {
-      setError('Please select or drop a resume PDF file to analyze.');
+      setError('Please select or drop a resume PDF/Image file to analyze.');
       return;
     }
     if (activeTab === 'text' && !rawResumeText.trim()) {
@@ -185,7 +189,7 @@ const Dashboard = () => {
                 }`}
               >
                 <Upload className="w-3.5 h-3.5 inline mr-1.5" />
-                Upload PDF File
+                Upload PDF/Image
               </button>
               <button
                 type="button"
@@ -215,7 +219,7 @@ const Dashboard = () => {
               {activeTab === 'upload' ? (
                 <div>
                   <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                    1. RESUME FILE (PDF FORMAT - MAX 10MB)
+                    1. RESUME FILE (PDF, JPG, JPEG, PNG - MAX 10MB)
                   </label>
                   
                   <div
@@ -234,7 +238,7 @@ const Dashboard = () => {
                       type="file"
                       ref={fileInputRef}
                       onChange={handleFileChange}
-                      accept=".pdf"
+                      accept=".pdf, .jpg, .jpeg, .png"
                       className="hidden"
                     />
                     
@@ -253,10 +257,10 @@ const Dashboard = () => {
                     ) : (
                       <div className="text-center font-mono">
                         <p className="text-xs font-bold uppercase tracking-wider text-white">
-                          Drag & Drop PDF or Click to Select File
+                          Drag & Drop File or Click to Select
                         </p>
                         <p className="text-[10px] text-zinc-500 mt-2 uppercase">
-                          Supports only raw vector or parsed PDF byte matrices
+                          Supports text PDFs or clear high-contrast images (JPG, PNG)
                         </p>
                       </div>
                     )}

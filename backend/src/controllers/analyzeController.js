@@ -1,9 +1,10 @@
 import pdfParse from 'pdf-parse';
+import Tesseract from 'tesseract.js';
 import prisma from '../config/db.js';
 import { analyzeResumeWithAI } from '../utils/aiAnalyzer.js';
 
 /**
- * Handle uploading, parsing, and analyzing a PDF resume or pasted text.
+ * Handle uploading, parsing (PDF/Image OCR), and analyzing a resume.
  */
 export async function analyzeResume(req, res) {
   try {
@@ -12,32 +13,47 @@ export async function analyzeResume(req, res) {
     let fileName = 'Pasted Resume Text';
 
     if (req.file) {
-      if (req.file.mimetype !== 'application/pdf') {
-        return res.status(400).json({ error: 'Only PDF files are supported' });
+      const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({ error: 'Only standard PDF, JPG, JPEG, and PNG files are supported' });
       }
       
       fileName = req.file.originalname;
 
-      // Parse PDF text from Buffer
-      let pdfData;
-      try {
-        pdfData = await pdfParse(req.file.buffer);
-      } catch (parseError) {
-        console.error('PDF parsing error:', parseError);
-        return res.status(400).json({ error: 'Failed to extract text from the PDF file' });
+      if (req.file.mimetype.startsWith('image/')) {
+        // Image Processing: Extract characters via Tesseract OCR
+        console.log(`[OCR] Executing text extraction on image: ${fileName}`);
+        try {
+          const ocrResult = await Tesseract.recognize(
+            req.file.buffer,
+            'eng'
+          );
+          resumeText = ocrResult.data.text;
+        } catch (ocrError) {
+          console.error('Tesseract OCR failed:', ocrError);
+          return res.status(502).json({ error: 'OCR engine failed to scan text from this image' });
+        }
+      } else {
+        // PDF Processing: Extract vector text layers
+        let pdfData;
+        try {
+          pdfData = await pdfParse(req.file.buffer);
+        } catch (parseError) {
+          console.error('PDF parsing error:', parseError);
+          return res.status(400).json({ error: 'Failed to extract text from the PDF file' });
+        }
+        resumeText = pdfData.text;
       }
-
-      resumeText = pdfData.text;
     } else if (rawResumeText && rawResumeText.trim().length > 0) {
       resumeText = rawResumeText;
     } else {
-      return res.status(400).json({ error: 'Please upload a PDF resume file or paste your resume text.' });
+      return res.status(400).json({ error: 'Please upload a PDF/Image resume file or paste your resume text.' });
     }
 
-    // Verify extracted or pasted text is not empty
+    // Verify extracted text is not empty
     if (!resumeText || resumeText.trim().length === 0) {
       return res.status(400).json({ 
-        error: 'The uploaded PDF appears to be empty or image-only. Please use the "Paste Text" option instead.' 
+        error: 'The uploaded file appears to be empty or does not contain readable text. Please try pasting the text instead.' 
       });
     }
 
