@@ -11,14 +11,17 @@ import {
   ChevronRight, 
   BrainCircuit, 
   CheckCircle2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FileCode
 } from 'lucide-react';
 
 const Dashboard = () => {
   const { token, getAuthHeaders, API_URL, user } = useContext(AuthContext);
   const navigate = useNavigate();
   
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'text'
   const [file, setFile] = useState(null);
+  const [rawResumeText, setRawResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,15 +109,23 @@ const Dashboard = () => {
     e.preventDefault();
     setError('');
     
-    if (!file) {
+    if (activeTab === 'upload' && !file) {
       setError('Please select or drop a resume PDF file to analyze.');
+      return;
+    }
+    if (activeTab === 'text' && !rawResumeText.trim()) {
+      setError('Please paste your resume text in the field below.');
       return;
     }
 
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('resume', file);
+    if (activeTab === 'upload') {
+      formData.append('resume', file);
+    } else {
+      formData.append('rawResumeText', rawResumeText);
+    }
     formData.append('jobDescription', jobDescription);
 
     try {
@@ -129,7 +140,7 @@ const Dashboard = () => {
         }
       );
       
-      // Successfully analyzed! Navigate to results view
+      // Navigate to results view
       navigate(`/results/${response.data.id}`);
     } catch (err) {
       console.error('Analysis submission failed:', err);
@@ -151,7 +162,7 @@ const Dashboard = () => {
     <div className="min-h-[calc(100vh-76px)] bg-neobg text-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left Column: Upload Console */}
+        {/* Left Column: Upload / Paste Console */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-neocard border-2 border-black p-6 shadow-neo">
             <h2 className="font-mono text-xl font-black uppercase tracking-tight text-white mb-2 flex items-center gap-2">
@@ -159,8 +170,36 @@ const Dashboard = () => {
               ANALYSIS INITIATION CONSOLE
             </h2>
             <p className="text-zinc-400 text-xs font-mono mb-6 uppercase">
-              FEED RESUME BYTESTREAM AND JOB DESCRIPTORS TO SCANNER
+              FEED RESUME BYTES OR TEXT MATRICES TO SCANNER
             </p>
+
+            {/* Ingestion Method Tabs */}
+            <div className="grid grid-cols-2 gap-2 p-1.5 bg-neogray border-neo border-2 mb-6">
+              <button
+                type="button"
+                onClick={() => { setActiveTab('upload'); setError(''); }}
+                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                  activeTab === 'upload'
+                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Upload className="w-3.5 h-3.5 inline mr-1.5" />
+                Upload PDF File
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('text'); setError(''); }}
+                className={`py-2.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                  activeTab === 'text'
+                    ? 'bg-neogreen text-black border border-black shadow-[2px_2px_0px_0px_#000]'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <FileCode className="w-3.5 h-3.5 inline mr-1.5" />
+                Paste Resume Text
+              </button>
+            </div>
 
             {error && (
               <div className="mb-6 p-4 border-neo bg-neopink/10 border-neopink text-neopink text-xs font-mono flex items-start gap-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -172,56 +211,71 @@ const Dashboard = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Drag and Drop Zone */}
-              <div>
-                <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
-                  1. RESUME FILE (PDF FORMAT - MAX 10MB)
-                </label>
-                
-                <div
-                  onDragEnter={handleDrag}
-                  onDragOver={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDrop={handleDrop}
-                  onClick={triggerFileSelect}
-                  className={`border-2 border-dashed p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-150 relative ${
-                    dragActive 
-                      ? 'border-neogreen bg-neogreen/5 shadow-[4px_4px_0px_0px_#00ff66]' 
-                      : 'border-zinc-800 bg-neogray shadow-none hover:border-zinc-600'
-                  }`}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept=".pdf"
-                    className="hidden"
-                  />
+              {/* Conditional Ingestion Zone */}
+              {activeTab === 'upload' ? (
+                <div>
+                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
+                    1. RESUME FILE (PDF FORMAT - MAX 10MB)
+                  </label>
                   
-                  <Upload className={`w-12 h-12 mb-4 transition-transform ${dragActive ? 'scale-110 text-neogreen' : 'text-zinc-500'}`} />
-                  
-                  {file ? (
-                    <div className="text-center font-mono">
-                      <p className="text-neogreen font-bold text-sm uppercase flex items-center justify-center gap-1.5">
-                        <FileText className="w-4 h-4" />
-                        {file.name}
-                      </p>
-                      <p className="text-[10px] text-zinc-500 mt-1">
-                        {(file.size / (1024 * 1024)).toFixed(2)} MB - READY FOR INGESTION
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center font-mono">
-                      <p className="text-xs font-bold uppercase tracking-wider text-white">
-                        Drag & Drop PDF or Click to Select File
-                      </p>
-                      <p className="text-[10px] text-zinc-500 mt-2 uppercase">
-                        Supports only raw vector or parsed PDF byte matrices
-                      </p>
-                    </div>
-                  )}
+                  <div
+                    onDragEnter={handleDrag}
+                    onDragOver={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={triggerFileSelect}
+                    className={`border-2 border-dashed p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-150 relative ${
+                      dragActive 
+                        ? 'border-neogreen bg-neogreen/5 shadow-[4px_4px_0px_0px_#00ff66]' 
+                        : 'border-zinc-800 bg-neogray shadow-none hover:border-zinc-600'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept=".pdf"
+                      className="hidden"
+                    />
+                    
+                    <Upload className={`w-12 h-12 mb-4 transition-transform ${dragActive ? 'scale-110 text-neogreen' : 'text-zinc-500'}`} />
+                    
+                    {file ? (
+                      <div className="text-center font-mono">
+                        <p className="text-neogreen font-bold text-sm uppercase flex items-center justify-center gap-1.5">
+                          <FileText className="w-4 h-4" />
+                          {file.name}
+                        </p>
+                        <p className="text-[10px] text-zinc-500 mt-1">
+                          {(file.size / (1024 * 1024)).toFixed(2)} MB - READY FOR INGESTION
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-center font-mono">
+                        <p className="text-xs font-bold uppercase tracking-wider text-white">
+                          Drag & Drop PDF or Click to Select File
+                        </p>
+                        <p className="text-[10px] text-zinc-500 mt-2 uppercase">
+                          Supports only raw vector or parsed PDF byte matrices
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-mono uppercase font-bold text-zinc-400 mb-2">
+                    1. PASTE YOUR RESUME TEXT
+                  </label>
+                  <textarea
+                    value={rawResumeText}
+                    onChange={(e) => setRawResumeText(e.target.value)}
+                    placeholder="Copy and paste the raw text from your resume (contact information, experience, education, projects, skills)..."
+                    rows={10}
+                    className="w-full bg-neogray border-neo p-4 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-neogreen focus:shadow-[2px_2px_0px_0px_#00ff66] transition-all resize-y"
+                  />
+                </div>
+              )}
 
               {/* Job Description Textarea */}
               <div>
@@ -311,7 +365,6 @@ const Dashboard = () => {
       {loading && (
         <div className="fixed inset-0 z-50 bg-[#07070acc]/90 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-neocard border-2 border-black max-w-lg w-full p-8 shadow-neo-green font-mono text-center relative overflow-hidden">
-            {/* Pulsing Grid Lines inside Overlay */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f2e_1px,transparent_1px),linear-gradient(to_bottom,#1f1f2e_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-10 animate-pulse pointer-events-none"></div>
 
             <BrainCircuit className="w-16 h-16 mx-auto mb-6 text-neogreen animate-bounce" />
@@ -328,7 +381,7 @@ const Dashboard = () => {
             <div className="space-y-3 text-left bg-neogray p-4 border border-zinc-800 text-[11px] leading-relaxed text-zinc-400">
               <p className="flex items-center gap-2 text-neogreen font-bold">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-neogreen animate-ping"></span>
-                [STATUS] Extracting text vectors via PDF binary stream...
+                [STATUS] Processing resume input vectors...
               </p>
               <p>[STATUS] Injecting evaluation rules for: <span className="text-white font-semibold">"{user?.targetJobRole || 'Software Engineering'}"</span></p>
               <p className="text-neocyan font-semibold animate-pulse">[INFO] Fetching evaluations from AI interface. This can take up to 45 seconds on Render cold starts...</p>

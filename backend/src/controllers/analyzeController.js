@@ -3,32 +3,42 @@ import prisma from '../config/db.js';
 import { analyzeResumeWithAI } from '../utils/aiAnalyzer.js';
 
 /**
- * Handle uploading, parsing, and analyzing a PDF resume.
+ * Handle uploading, parsing, and analyzing a PDF resume or pasted text.
  */
 export async function analyzeResume(req, res) {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Please upload a PDF resume file' });
+    const { jobDescription, rawResumeText } = req.body;
+    let resumeText = '';
+    let fileName = 'Pasted Resume Text';
+
+    if (req.file) {
+      if (req.file.mimetype !== 'application/pdf') {
+        return res.status(400).json({ error: 'Only PDF files are supported' });
+      }
+      
+      fileName = req.file.originalname;
+
+      // Parse PDF text from Buffer
+      let pdfData;
+      try {
+        pdfData = await pdfParse(req.file.buffer);
+      } catch (parseError) {
+        console.error('PDF parsing error:', parseError);
+        return res.status(400).json({ error: 'Failed to extract text from the PDF file' });
+      }
+
+      resumeText = pdfData.text;
+    } else if (rawResumeText && rawResumeText.trim().length > 0) {
+      resumeText = rawResumeText;
+    } else {
+      return res.status(400).json({ error: 'Please upload a PDF resume file or paste your resume text.' });
     }
 
-    if (req.file.mimetype !== 'application/pdf') {
-      return res.status(400).json({ error: 'Only PDF files are supported' });
-    }
-
-    const { jobDescription } = req.body;
-
-    // Parse PDF text from Buffer
-    let pdfData;
-    try {
-      pdfData = await pdfParse(req.file.buffer);
-    } catch (parseError) {
-      console.error('PDF parsing error:', parseError);
-      return res.status(400).json({ error: 'Failed to extract text from the PDF file' });
-    }
-
-    const resumeText = pdfData.text;
+    // Verify extracted or pasted text is not empty
     if (!resumeText || resumeText.trim().length === 0) {
-      return res.status(400).json({ error: 'The uploaded PDF appears to be empty or image-only' });
+      return res.status(400).json({ 
+        error: 'The uploaded PDF appears to be empty or image-only. Please use the "Paste Text" option instead.' 
+      });
     }
 
     // Call dynamic AI analyzer engine
@@ -62,7 +72,7 @@ export async function analyzeResume(req, res) {
     const savedAnalysis = await prisma.resumeAnalysis.create({
       data: {
         userId: req.user.userId,
-        fileName: req.file.originalname,
+        fileName: fileName,
         atsScore: parseInt(atsScore, 10),
         targetJobDescription: jobDescription || null,
         strengths: strengths,
