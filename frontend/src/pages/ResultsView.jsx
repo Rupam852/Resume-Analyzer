@@ -10,7 +10,8 @@ import {
   ListChecks, 
   FileText, 
   ShieldAlert,
-  Award
+  Award,
+  Download
 } from 'lucide-react';
 
 const ResultsView = () => {
@@ -141,10 +142,17 @@ const ResultsView = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 no-print">
             <div className="px-3.5 py-1.5 rounded-lg border border-white/5 bg-white/[0.01] font-mono text-[9px] font-bold tracking-wider text-zinc-500 uppercase">
               ENGINE: {analysis.providerUsed.toUpperCase()} ({analysis.modelUsed})
             </div>
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold uppercase transition-all duration-200 cursor-pointer shadow-sm text-zinc-300 hover:text-white"
+            >
+              <Download className="w-3.5 h-3.5 text-neogreen" />
+              Download PDF
+            </button>
           </div>
         </div>
 
