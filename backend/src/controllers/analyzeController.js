@@ -216,3 +216,32 @@ export async function getAnalysisById(req, res) {
     res.status(500).json({ error: 'Internal server error while fetching analysis details' });
   }
 }
+
+/**
+ * Delete a single resume analysis record by ID.
+ */
+export async function deleteAnalysisById(req, res) {
+  try {
+    const { id } = req.params;
+    const analysis = await prisma.resumeAnalysis.findUnique({
+      where: { id }
+    });
+
+    if (!analysis) {
+      return res.status(404).json({ error: 'Analysis record not found' });
+    }
+
+    if (analysis.userId !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this analysis record' });
+    }
+
+    await prisma.resumeAnalysis.delete({
+      where: { id }
+    });
+
+    res.json({ message: 'Analysis record deleted successfully' });
+  } catch (error) {
+    console.error('Delete analysis error:', error);
+    res.status(500).json({ error: 'Internal server error while deleting analysis record' });
+  }
+}

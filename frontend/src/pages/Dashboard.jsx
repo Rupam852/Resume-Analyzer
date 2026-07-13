@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   FileSpreadsheet,
   FileCode,
-  Globe
+  Globe,
+  Trash2
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -161,6 +162,20 @@ const Dashboard = () => {
         'Analysis failed. The server took too long to respond or returned an error.'
       );
       setLoading(false);
+    }
+  };
+
+  const handleDeleteHistory = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to permanently delete this analysis record from your history?")) return;
+    
+    try {
+      await axios.delete(`${API_URL}/api/resume/${id}`, getAuthHeaders());
+      setHistory(history.filter(item => item.id !== id));
+    } catch (err) {
+      console.error('Failed to delete history record:', err);
+      alert(err.response?.data?.error || 'Failed to delete record');
     }
   };
 
@@ -374,12 +389,14 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-3 overflow-y-auto max-h-[500px] pr-2">
                 {history.map((item) => (
-                  <Link
+                  <div
                     key={item.id}
-                    to={`/results/${item.id}`}
-                    className="block p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/10 transition-all flex items-center justify-between group shadow-sm"
+                    className="p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] hover:border-white/10 transition-all flex items-center justify-between group shadow-sm"
                   >
-                    <div className="min-w-0 pr-3">
+                    <div 
+                      onClick={() => navigate(`/results/${item.id}`)}
+                      className="min-w-0 pr-3 flex-grow cursor-pointer"
+                    >
                       <h4 className="font-semibold text-xs text-white truncate max-w-[150px]">
                         {item.fileName}
                       </h4>
@@ -392,13 +409,19 @@ const Dashboard = () => {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2.5 shrink-0">
                       <div className={`px-2.5 py-1 rounded-md border text-xs font-mono font-bold shadow-sm ${getScoreColorClass(item.atsScore)}`}>
                         {item.atsScore}%
                       </div>
-                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
+                      <button
+                        onClick={(e) => handleDeleteHistory(e, item.id)}
+                        className="p-1.5 rounded-lg border border-white/5 hover:border-rose-500/30 hover:bg-rose-500/10 text-zinc-500 hover:text-rose-400 transition-all cursor-pointer"
+                        title="Delete log"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}

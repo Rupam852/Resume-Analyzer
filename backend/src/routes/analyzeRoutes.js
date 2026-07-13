@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { analyzeResume, getUserAnalyses, getAnalysisById } from '../controllers/analyzeController.js';
+import { analyzeResume, getUserAnalyses, getAnalysisById, deleteAnalysisById } from '../controllers/analyzeController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -16,5 +16,6 @@ const upload = multer({
 router.post('/analyze', authenticateToken, upload.single('resume'), analyzeResume);
 router.get('/history', authenticateToken, getUserAnalyses);
 router.get('/:id', authenticateToken, getAnalysisById);
+router.delete('/:id', authenticateToken, deleteAnalysisById);
 
 export default router;
