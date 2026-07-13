@@ -11,9 +11,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS Configuration (dynamic bindings)
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+if (!frontendUrl.startsWith('http://') && !frontendUrl.startsWith('https://')) {
+  frontendUrl = `https://${frontendUrl}`;
+}
+
 app.use(cors({
-  origin: [frontendUrl, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [
+    frontendUrl,
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
